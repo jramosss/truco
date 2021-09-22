@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import FastAPI
-from api.routers import register
+from api.routers import register,login
 from starlette.middleware.cors import CORSMiddleware
 import db.models.db
 
@@ -13,6 +13,7 @@ def read_root():
 
 
 app.include_router(register.router)
+app.include_router(login.router)
 
 app.add_middleware(
     CORSMiddleware,
