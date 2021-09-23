@@ -40,4 +40,4 @@ def check_credentials (username : str,password : str):
     except IndexError:
         raise UsernameNotFound()
 
-    return user
+    return user[0]
