@@ -12,32 +12,33 @@ class Rules:
         self.flor = flor
         self.mano = mano
 
+    def json (self):
+        return {
+            "flor" : self.flor,
+            "mano" : self.mano.value
+        }
+
 
 class RoomStatus(Enum):
     LOBBY = "Lobby"
     INGAME = "In Game"
     FINISHED = "Finished"
 
-
-class Team:
-    def __init__(self,members : List[str], points : int) -> None:
-        self.members = members
-        self.points = points
-
-
+default_rules = Rules(False,Mano.EQUIPO)
 class Room:
-    def __init__(self,name,status : RoomStatus,rules : Rules,min_players = 2,max_players = 6, max_points = 30) -> None:
+    def __init__(self,name,owner : str,rules : Rules = default_rules,
+                status : RoomStatus = RoomStatus.LOBBY,
+                min_players = 2,max_players = 6, max_points = 30) -> None:
         self.name = name
         self.min_players = min_players
         self.max_players = max_players
-        self.current_players = []
+        self.current_players = [owner]
         self.rules = rules
-        self.owner = None
+        self.owner = owner
         self.status = status
         self.messages = []
-        self.team1 = Team([],0)
-        self.team2 = Team([],0)
-        self.created = datetime.now().date().timetuple()
+        self.teams = {"1" : [],"2" : []}
+        self.created = datetime.now()
         self.max_points = max_points
         self.game = None
 
@@ -119,4 +120,18 @@ class Room:
     def get_messages(self):
         return self.messages
 
+
+    def json (self):
+        return {
+            "name" : self.name,
+            "max_players" : self.max_players,
+            "min_players" : self.min_players,
+            "current_players" : self.current_players,
+            #"rules" : {"flor" : self.rules.flor, "mano" : self.rules.mano},
+            "max_points" : self.max_points,
+            "teams" : self.teams,
+            "status" : self.status,
+            "created" : self.created,
+            "owner" : self.owner
+        }
     

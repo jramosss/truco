@@ -1,9 +1,9 @@
 from typing import Optional
 
 from fastapi import FastAPI
-from api.routers import register,login
+from api.routers import users,room
 from starlette.middleware.cors import CORSMiddleware
-import db.models.db
+from db.models.db import define
 
 app = FastAPI()
 
@@ -11,9 +11,10 @@ app = FastAPI()
 def read_root():
     return {"Hello": "World"}
 
+define(provider='sqlite', filename='db.sqlite', create_db=True)
 
-app.include_router(register.router)
-app.include_router(login.router)
+app.include_router(users.router)
+app.include_router(room.router)
 
 app.add_middleware(
     CORSMiddleware,

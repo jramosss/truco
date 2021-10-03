@@ -1,7 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from pydantic.networks import EmailStr
-
+from db.models.db import db
+from pony.orm import db_session
 
 class User(BaseModel):
     """
@@ -19,7 +20,7 @@ class User(BaseModel):
         max_length=54,
         regex="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,32}$",
     )
-    icon: str = None
+    icon: str = 'string'
     email_confirmed: Optional[bool] = False
 
 
@@ -45,3 +46,8 @@ class NewPassword(BaseModel):
 
 class NewUsername(BaseModel):
     username: str = Field(..., min_length=4, max_length=20)
+
+@ db_session
+def check_email_status (email : str):
+    user = db.DB_User.get(email=email)
+    return user.email_confirmed

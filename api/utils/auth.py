@@ -1,11 +1,9 @@
 # authentication.py
 from fastapi import Depends, HTTPException, status
 from typing import Optional
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-#from jose import JWTError, jwt
-from jwt import encode, decode, PyJWTError as JWTError
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from db.models.user import Token
 
 
 """
@@ -23,7 +21,7 @@ def verify_token(token: str = Depends(oauth2_scheme)):
     if it fails to check, it returns a message of "invalid credentials".
     """
     try:
-        payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("email")
         if email is None:
             raise HTTPException(
@@ -38,27 +36,29 @@ def verify_token(token: str = Depends(oauth2_scheme)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-
-def valid_credentials(token: str = Depends(oauth2_scheme)):
-    try:
-        payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("email")
-        if email is None:
-            return None
-    except JWTError:
-        return None
+def valid_credentials (token: str = Depends(oauth2_scheme)):
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    email: str = payload.get("email")
     return email
 
 
 def get_username_from_token(token: str = Depends(oauth2_scheme)):
     try:
-        payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         uname: str = payload.get("username")
         if uname is None:
             return None
     except JWTError:
         return None
     return uname
+
+
+def get_logged_users (token : str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        return None
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -68,10 +68,21 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
 
-def hash_password (password : str):
-    return password
+# pass_handler
 
+from passlib.context import CryptContext
+
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def verify_password(password, hashed_password):
+    return pwd_context.verify(password, hashed_password)
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)

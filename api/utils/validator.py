@@ -10,9 +10,9 @@ import smtplib
 #load_dotenv('.env')
 
 class Validation:
-
+    #TODO make the validation mail expire after some time
     def __init__(self):
-        self.__verification_code = self.__generate_random_string(5)
+        self.__verification_code : str = self.__generate_random_string(5)
 
     def __generate_random_string(self, length):
         letters = string.ascii_uppercase
