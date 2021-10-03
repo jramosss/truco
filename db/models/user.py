@@ -48,6 +48,6 @@ class NewUsername(BaseModel):
     username: str = Field(..., min_length=4, max_length=20)
 
 @ db_session
-def check_email_status (email : str):
+def check_email_status (email : str) -> bool:
     user = db.DB_User.get(email=email)
     return user.email_confirmed

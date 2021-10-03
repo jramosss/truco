@@ -45,7 +45,7 @@ def save_room_on_database(room: Room):
                 db_room.set(min_players=room.min_players)
                 db_room.set(max_players=room.max_players)
                 db_room.set(current_players={"users": room.get_users()})
-                db_room.set(rules=room.rules.json())
+                db_room.set(rules=room.rules.json() if type(room.rules) != str else room.rules)
                 db_room.set(owner=room.get_owner())
                 db_room.set(status=room.get_status())
                 db_room.set(game={})
@@ -62,7 +62,7 @@ def save_room_on_database(room: Room):
                     game={},
                     teams=json["teams"],
                     created=room.created,
-                    rules=room.rules.json()
+                    rules=room.rules.json() if type(room.rules != str) else room.rules
                 )
     except Exception as e:
         print(f"Something went wrong on the db, {e}")

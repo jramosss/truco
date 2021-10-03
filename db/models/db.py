@@ -1,3 +1,4 @@
+from typing import List
 from api.classes.room import Room, RoomStatus
 from pony.orm import *
 from datetime import date, datetime
@@ -18,7 +19,7 @@ def define (**db_params):
         hashed_password = Required(str)
         email_confirmed = Required(bool)
         icon = Optional(str)
-        creation_date = Required(datetime)
+        creation_date = Required(Json)
 
     class DB_Room(db.Entity):
         """
