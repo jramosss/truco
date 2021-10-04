@@ -21,6 +21,14 @@ router = APIRouter()
 
 #!Debug
 me = User(username='Chuls',password='Heladera65',email='jramostod@gmail.com')
+player0 = User(username='player0',password='Heladera66',email='player0@example.com')
+player1 = User(username='player1',password='Heladera67',email='player1@example.com')
+player2 = User(username='player2',password='Heladera68',email='player2@example.com')
+player3 = User(username='player3',password='Heladera69',email='player3@example.com')
+player4 = User(username='player4',password='Heladera70',email='player4@example.com')
+
+test_users = [me,player0,player1,player2,player3,player4]
+
 
 @router.post("/register", tags=["Users"], status_code=201)
 async def register(user: User = me):
@@ -43,7 +51,7 @@ async def register(user: User = me):
             )
             commit()
 
-        if user == me:
+        if user in test_users:
             with db_session:
                 user = db.DB_User.get(email=user.email)
                 user.set(email_confirmed=True)
@@ -72,6 +80,41 @@ async def register(user: User = me):
                 status_code=409, detail="Email already registered")
         return {msg}
 
+
+#!DEBUGGING ONLY
+
+@db_session
+def sample_users_registered () -> bool:
+    registered = 0
+    for user in test_users:
+        us = db.DB_User.get(email=user.email)
+        if us:
+            registered += 1
+    
+    return registered == len(test_users)
+
+
+@router.on_event('startup')
+async def register_sample_users ():
+    if sample_users_registered():
+        return
+
+    for user in test_users:
+        with db_session:
+            db.DB_User(
+                username=user.username,
+                email=user.email,
+                hashed_password=get_password_hash(user.password),
+                email_confirmed=False,
+                icon=user.icon,
+                creation_date=datetime.today().strftime("%Y-%m-%d"),
+            )
+
+            u = db.DB_User.get(email=user.email)
+            u.set(email_confirmed=True)
+
+            commit()
+    print("Sample users registered!")
 
 @router.get('/registered',tags=["Debug"],status_code=200)
 async def dump_registered_users ():
@@ -154,7 +197,7 @@ async def login (form : OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.put("/users/refresh", tags=["Login"], response_model=Token, status_code=201)
+@router.put("/users/refresh", tags=["Users"], response_model=Token, status_code=201)
 #async def refresh_token(email: str = Depends(valid_credentials)):
 async def refresh_token(email : str = 'jramostod@gmail.com'):
     """

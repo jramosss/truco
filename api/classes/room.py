@@ -1,4 +1,5 @@
 from enum import Enum
+from inspect import Attribute
 from random import randint
 from datetime import datetime
 from typing import List
@@ -8,15 +9,18 @@ class Mano(Enum):
     JUGADOR = "Jugador"
 
 class Rules:
-    def __init__(self, flor : bool, mano : Mano) -> None:
+    def __init__(self, flor : bool, mano : str) -> None:
         self.flor = flor
         self.mano = mano
 
     def json (self):
         return {
             "flor" : self.flor,
-            "mano" : self.mano.value
+            "mano" : self.mano
         }
+    
+    def fromJSON (self,json : object):
+        return Rules(json['flor'],json['mano'])
 
 
 class RoomStatus(Enum):
@@ -24,15 +28,15 @@ class RoomStatus(Enum):
     INGAME = "In Game"
     FINISHED = "Finished"
 
-default_rules = Rules(False,Mano.EQUIPO)
+default_rules = Rules(False,Mano.EQUIPO.value)
 class Room:
     def __init__(self,name,owner : str,rules : Rules = default_rules,
-                status : RoomStatus = RoomStatus.LOBBY,
+                status : str = RoomStatus.LOBBY.value,
                 min_players = 2,max_players = 6, max_points = 30) -> None:
         self.name = name
         self.min_players = min_players
         self.max_players = max_players
-        self.current_players = [owner]
+        self.current_players = []
         self.rules = rules
         self.owner = owner
         self.status = status
@@ -44,7 +48,7 @@ class Room:
 
 
     def is_joinable (self):
-        return len(self.current_players) < self.max_players and self.status == RoomStatus.LOBBY
+        return len(self.current_players) < self.max_players and self.status == RoomStatus.LOBBY.value
 
     def join (self, email : str):
         if self.is_joinable():
@@ -71,7 +75,7 @@ class Room:
         """User count getter"""
         return len(self.current_players)
 
-    def get_owner(self):
+    def get_owner(self) -> str:
         return self.owner
 
     def get_users (self):
@@ -83,8 +87,20 @@ class Room:
     def get_max_players(self):
         return self.max_players
 
-    def set_status(self, status: RoomStatus):
+    def set_status(self, status: str):
         self.status = status
+
+    def set_rules (self,rules : Rules):
+        self.rules = rules
+
+    def set_teams (self,teams : object):
+        self.teams = teams
+
+    def set_created (self,created : datetime):
+        self.created = created
+    
+    def set_max_points (self,max_points : int):
+        self.max_points = max_points
 
     def update_status(self):
         game = self.get_game()
@@ -127,7 +143,7 @@ class Room:
             "max_players" : self.max_players,
             "min_players" : self.min_players,
             "current_players" : self.current_players,
-            #"rules" : {"flor" : self.rules.flor, "mano" : self.rules.mano},
+            "rules" : self.rules.json(),
             "max_points" : self.max_points,
             "teams" : self.teams,
             "status" : self.status,

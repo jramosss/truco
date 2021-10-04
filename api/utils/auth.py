@@ -53,6 +53,10 @@ def get_username_from_token(token: str = Depends(oauth2_scheme)):
     return uname
 
 
+def get_user_token (token : str = Depends(oauth2_scheme)):
+    return token
+
+
 def get_logged_users (token : str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])

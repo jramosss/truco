@@ -51,34 +51,6 @@ def define (**db_params):
     db.bind(**db_params)
     db.generate_mapping(create_tables=True)
 
-@ db_session
-def load():
-    db_rooms = []
-    try:
-        with db_session:
-            db_rooms = db.DB_Room.select()
-    except Exception as e:
-        print(e)
-
-    rooms = []
-    for room in db_rooms:
-        new_room = Room(room.name, room.max_players, room.owner)
-        new_room.current_players = room.current_players
-        if room.status == RoomStatus.LOBBY.value:
-            new_room.set_status(RoomStatus.LOBBY)
-        elif room.status == RoomStatus.INGAME.value:
-            new_room.set_status(RoomStatus.INGAME)
-        else:
-            new_room.set_status(RoomStatus.FINISHED)
-
-        if (new_room.get_status() != RoomStatus.LOBBY and room.game is not {}):
-            #new_room.game = Game(new_room.get_user_list())
-            new_room.game.build_from_json(room.game)
-
-        rooms.append(new_room)
-
-    return rooms
-
 
 def save():
     pass
