@@ -2,9 +2,9 @@ from db.models.db import db  # ,Validation_Tuple
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pony.orm import db_session, commit
-from random import choice
 import string
 import smtplib
+from secrets import choice , token_urlsafe
 #from dotenv import load_dotenv
 
 #load_dotenv('.env')
@@ -12,10 +12,10 @@ import smtplib
 class Validation:
     #TODO make the validation mail expire after some time
     def __init__(self):
-        self.__verification_code : str = self.__generate_random_string(5)
+        self.__verification_code : str = self.__generate_random_string(8)
 
     def __generate_random_string(self, length):
-        letters = string.ascii_uppercase
+        letters = string.ascii_uppercase + string.digits
         result_str = ''.join(choice(letters) for _ in range(length))
         return result_str
 

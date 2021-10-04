@@ -4,6 +4,8 @@ from random import randint
 from datetime import datetime
 from typing import List
 
+from api.classes.game import Game
+
 class Mano(Enum):
     EQUIPO = "Equipo"
     JUGADOR = "Jugador"
@@ -151,3 +153,8 @@ class Room:
             "owner" : self.owner
         }
     
+    def start_game (self,random_teams : bool = False,teams = ([],[])):
+        self.set_status(RoomStatus.INGAME.value)
+        self.game = Game(self.current_players,self.max_points,self.rules,random_teams,teams)
+
+

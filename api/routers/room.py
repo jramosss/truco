@@ -183,3 +183,30 @@ async def leave_room(
     else:
         room.leave(email)
         return {"message": f"Left {room_name}"}
+
+
+@ router.put("/{room_name}/start", tags=["Game"], status_code=status.HTTP_201_CREATED)
+async def start_game(
+        room_name: str = Path(
+            ...,
+            min_length=2,
+            max_length=20,
+        ),
+        email: str = Depends(valid_credentials)):
+    """
+    Endpoint for starting the game, should only be used by the room owner.
+    """
+    room = hub.get_room_by_name(room_name)
+    if (room.owner != email):
+        raise HTTPException(
+            status_code=403, detail="You're not the owner of the room")
+    elif (len(room.get_users()) < room.min_players):
+        raise HTTPException(
+            status_code=409, detail="Not enough players")
+    elif (room.get_status() != RoomStatus.LOBBY.value):
+        raise HTTPException(
+            status_code=409, detail="Game on room has already started")
+    else:
+        room.start_game()
+        save_room_on_database(room)
+        return {"message": "Succesfully started"}
