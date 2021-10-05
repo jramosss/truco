@@ -34,11 +34,13 @@ default_rules = Rules(False,Mano.EQUIPO.value)
 class Room:
     def __init__(self,name,owner : str,rules : Rules = default_rules,
                 status : str = RoomStatus.LOBBY.value,
-                min_players = 2,max_players = 6, max_points = 30) -> None:
+                min_players = 2,max_players = 6, max_points = 30,
+                current_players : List[str] = []) -> None:
+                #Remove this
         self.name = name
         self.min_players = min_players
         self.max_players = max_players
-        self.current_players = []
+        self.current_players = current_players
         self.rules = rules
         self.owner = owner
         self.status = status
@@ -137,7 +139,6 @@ class Room:
 
     def get_messages(self):
         return self.messages
-
 
     def json (self):
         return {

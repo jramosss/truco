@@ -16,7 +16,7 @@ router = APIRouter()
 hub = RoomHub()
 
 room0 = Room(name='room0',owner='jramostod@gmail.com')
-room1 = Room(name='room1',owner='jramostod@gmail.com',rules=Rules(True,Mano.EQUIPO.value))
+room1 = Room(name='room1',owner='jramostod@gmail.com',rules=Rules(True,Mano.EQUIPO.value),current_players=['jramostod@gmail.com','player0@example.com'])
 room2 = Room(name='room2',owner='jramostod@gmail.com',rules=Rules(True,Mano.JUGADOR.value))
 room3 = Room(name='room3',owner='jramostod@gmail.com',rules=Rules(False,Mano.JUGADOR.value))
 room4 = Room(name='room4',owner='jramostod@gmail.com',rules=Rules(False,Mano.EQUIPO.value))
@@ -210,3 +210,28 @@ async def start_game(
         room.start_game()
         save_room_on_database(room)
         return {"message": "Succesfully started"}
+
+
+@ router.get("/{room_name}/state", tags=["Game"], status_code=status.HTTP_200_OK)
+async def get_game_state(
+        room_name: str = Path(
+            ...,
+            min_length=2,
+            max_length=20,
+            description="The room wich you want to get the game state of",
+        ),
+        email : str = Depends(valid_credentials)):
+
+    room = hub.get_room_by_name(room_name)
+    if room is None:
+        raise HTTPException(status_code=404, detail="Room not found")
+    elif email not in room.get_users():
+        raise HTTPException(status_code=403,
+                            detail="You're not in this room")
+    elif room.status == RoomStatus.LOBBY:
+        return {"room_status": room.status, "users": room.current_players, "owner": room.owner}
+    else:
+        room.update_status()
+        game = room.get_game()
+
+        return game.json()

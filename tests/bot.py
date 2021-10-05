@@ -57,8 +57,8 @@ url = "http://127.0.0.1:8000"
 print("prejoin")
 join = requests.get(f"{url}/room/join/{room_name}", headers=header)
 print("post join")
-chat = requests.put(f"{url}/{room_name}/chat", json={"msg": "Hello There!"},
-                    headers=header)
+#chat = requests.put(f"{url}/{room_name}/chat", json={"msg": "Hello There!"},
+#                    headers=header)
 game_not_begun = True
 while game_not_begun:
     sleep(3)
@@ -67,9 +67,9 @@ while game_not_begun:
     if (state['room_status'] == "In game"):
         prob = randint(1, 4)
         sleep(prob)
-        chat = requests.put(f"{url}/{room_name}/chat",
-                            json={"msg": choice(messages)},
-                            headers=header)
+        #chat = requests.put(f"{url}/{room_name}/chat",
+        #                    json={"msg": choice(messages)},
+        #                    headers=header)
         game_not_begun = False
         break
 
