@@ -114,7 +114,7 @@ class Room:
 
     def dump_game_json(self):
         game = self.get_game()
-        if self.get_game() is not None:
+        if game is not None:
             pass
         else:
             json = {}
