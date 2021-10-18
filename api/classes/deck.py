@@ -1,6 +1,6 @@
 from random import shuffle
 from typing import List
-from card import Card
+from .card import Card
 
 ALL_CARDS = [
         Card(1, 3),
@@ -55,7 +55,8 @@ class Deck:
     def get_cards (self,n : int) -> List[List[Card]]:
         manos = []
         for _ in range (n):
-            self.__print_mano(list(self.deck[0:3]))
+            #self.__print_mano(list(self.deck[0:3]))
+            manos.append(self.deck[0:3])
             self.used.append(self.deck[0])
             self.used.append(self.deck[1])
             self.used.append(self.deck[2])

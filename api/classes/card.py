@@ -1,4 +1,5 @@
 from enum import Enum
+from random import Random, random
 
 class Palo(Enum):
     BASTO = 1
@@ -18,11 +19,16 @@ class Palo(Enum):
         else:
             return f'invalid number {palo}'
 
-
+'''
+0 - Copa
+1 - Basto
+2 - Oro
+3 - Espada
+'''
 class Card:
     def __init__(self, number: int, palo: int):
-        self.number = number
-        self.palo = palo
+        self.number = number if number != -1 else Random().randint(1,12)
+        self.palo = palo if palo != -1 else Random().randint(0,3)
 
     def get_number(self):
         return self.number
@@ -77,3 +83,6 @@ class Card:
 
     def __str__(self) -> str:
         return str(self.number) + " de " + str(Palo.from_int(self.palo))
+
+    def __eq__(self, o: object) -> bool:
+        return self.number == o.number and self.palo == o.palo
